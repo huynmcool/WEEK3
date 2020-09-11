@@ -1,0 +1,254 @@
+package com.john117.string_travel.ui.feed.adapter
+
+import android.view.View
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.john117.string_travel.R
+import com.john117.string_travel.model.Feed
+import com.john117.string_travel.ui.feed.events.TypeFeedEvent
+import com.john117.string_travel.utils.*
+
+
+import kotlinx.android.synthetic.main.item_feed_post.view.*
+
+
+
+class PostViewHolder(
+    itemView: View,
+    private val events: (id: Int, type: TypeFeedEvent) -> Unit
+) : BaseViewHolder<Feed>(itemView) {
+
+    override fun bind(item: Feed, position: Int) {
+        if (item.videos != null) {
+            itemView.tv_time_duration.visible()
+            itemView.tv_time_duration.text = item.videos.duration?.let { convertIntoTime(it) }
+            itemView.btn_play_video.visible()
+            itemView.ll_image_feed.visible()
+            itemView.ll_img_post_bot.gone()
+            Glide.with(itemView)
+                .load(item.videos.thumbs)
+                .apply(RequestOptions().transform(CenterCrop(), RoundedCorners(20)))
+                .into(itemView.img_post_top)
+        }
+        // Load image post
+        item.photos?.let { photos ->
+            itemView.tv_time_duration.gone()
+            itemView.btn_play_video.gone()
+            itemView.ll_image_feed.visible()
+            when (photos.size) {
+                1 -> {
+                    itemView.ll_img_post_bot.gone()
+                    Glide.with(itemView)
+                        .load(photos[0].url?.medium)
+                        .apply(RequestOptions().transform(CenterCrop(), RoundedCorners(20)))
+                        .into(itemView.img_post_top)
+                }
+                2 -> {
+                    Glide.with(itemView)
+                        .load(photos[0].url?.medium)
+                        .apply(RequestOptions().transform(
+                            CenterCrop(),
+                            RoundedCornersTransformation(
+                                itemView.context,
+                                20,
+                                0,
+                                RoundedCornersTransformation.CornerType.TOP
+                            )
+                        ))
+                        .into(itemView.img_post_top)
+
+                    itemView.ll_img_post_bot.visible()
+                    itemView.img_post_right.gone()
+                    itemView.line_img_bot.gone()
+                    Glide.with(itemView)
+                        .load(photos[1].url?.medium)
+                        .apply(
+                            RequestOptions().transform(
+                            CenterCrop(),
+                            RoundedCornersTransformation(
+                                itemView.context,
+                                20,
+                                0,
+                                RoundedCornersTransformation.CornerType.BOTTOM
+                            )
+                        ))
+                        .error(R.drawable.no_image)
+                        .into(itemView.img_post_left)
+                }
+                else -> {
+                    itemView.ll_img_post_bot.visible()
+                    Glide.with(itemView)
+                        .load(photos[0].url?.medium).apply(
+                            RequestOptions().transform(
+                                CenterCrop(),
+                                RoundedCornersTransformation(
+                                    itemView.context,
+                                    20,
+                                    0,
+                                    RoundedCornersTransformation.CornerType.TOP
+                                )
+                            ))
+                        .into(itemView.img_post_top)
+                    itemView.img_post_left.visible()
+                    itemView.img_post_right.visible()
+                    Glide.with(itemView)
+                        .load(photos[1].url?.medium)
+                        .apply(
+                            RequestOptions().transform(
+                                CenterCrop(),
+                                RoundedCornersTransformation(
+                                    itemView.context,
+                                    20,
+                                    0,
+                                    RoundedCornersTransformation.CornerType.BOTTOM_LEFT
+                                )
+                            )
+                        )
+                        .error(R.drawable.no_image)
+                        .into(itemView.img_post_left)
+                    Glide.with(itemView)
+                        .load(photos[2].url?.medium)
+                        .apply(
+                            RequestOptions().transform(
+                                CenterCrop(),
+                                RoundedCornersTransformation(
+                                    itemView.context,
+                                    20,
+                                    0,
+                                    RoundedCornersTransformation.CornerType.BOTTOM_RIGHT
+                                )
+                            )
+                        )
+                        .error(R.drawable.no_image)
+                        .into(itemView.img_post_right)
+                }
+            }
+        }
+
+        // Set image avatar
+        Glide.with(itemView)
+            .load(item.user?.profilePhoto)
+            .error(R.drawable.ic_acc_img)
+            .into(itemView.iv_avatar_feed_post)
+
+        // Set text view
+        itemView.txt_username_feed.text = item.user?.username
+        itemView.tv_time_post.text = item.updatedAt
+        itemView.tv_description_feed.text = item.description
+        itemView.tv_location_feed.text = item.place?.title
+
+        // Set status button save
+        itemView.btn_save_post.text = item.saveCounter.toString()
+        if (item.isSaved == true) { // Saved
+            itemView.btn_save_post.isSelected = true
+            itemView.btn_save_post.setTextColor(
+                ContextCompat.getColorStateList(
+                    itemView.context,
+                    R.color.colorWhite
+                )
+            )
+            itemView.btn_save_post.setCompoundDrawablesWithIntrinsicBounds(
+                itemView.context.getDrawable(R.drawable.ic_save_selected), null, null, null
+            )
+        } else { // Not save
+            itemView.btn_save_post.isSelected = false
+            itemView.btn_save_post.setTextColor(
+                ContextCompat.getColorStateList(
+                    itemView.context,
+                    R.color.colorPurple
+                )
+            )
+            itemView.btn_save_post.setCompoundDrawablesWithIntrinsicBounds(
+                itemView.context.getDrawable(R.drawable.ic_save), null, null, null
+            )
+        }
+
+        // Comment
+        if (item.commentCounter != 0) {
+            itemView.tv_cmt_count.visible()
+            itemView.tv_cmt_count.text = item.commentCounter.toString()
+        } else
+            itemView.tv_cmt_count.invisible()
+
+        // Like
+        itemView.btn_like_post.isSelected = item.isLiked?:false
+        if (item.likeCounter != 0) {
+            itemView.tv_like_count.visible()
+            itemView.tv_like_count.text = item.likeCounter.toString()
+        } else
+            itemView.tv_like_count.invisible()
+
+        addEvents(item, position)
+    }
+
+    private fun addEvents(item: Feed, position: Int) {
+        //  Button comment click
+        itemView.btn_cmt_post.setOnClickListener {
+            events.invoke(position, TypeFeedEvent.COMMENT)
+        }
+
+        //  Button show more
+        itemView.btn_show_more_post.setOnClickListener {
+            events.invoke(position, TypeFeedEvent.SHOW_MORE)
+        }
+
+        // Button like click listener
+        itemView.btn_like_post.setOnClickListener {
+            itemView.btn_like_post.isSelected = !itemView.btn_like_post.isSelected
+            if (itemView.btn_like_post.isSelected) {
+                item.likeCounter = item.likeCounter?.plus(1)
+            } else
+                item.likeCounter = item.likeCounter?.minus(1)
+
+            if (item.likeCounter != 0) {
+                itemView.tv_like_count.visible()
+                itemView.tv_like_count.text = item.likeCounter.toString()
+            } else
+                itemView.tv_like_count.invisible()
+            events.invoke(position, TypeFeedEvent.LIKE)
+        }
+
+        // Button save listener
+        itemView.btn_save_post.setOnClickListener {
+            itemView.btn_save_post.isSelected = !itemView.btn_save_post.isSelected
+            item.isSaved = itemView.btn_save_post.isSelected
+            if (itemView.btn_save_post.isSelected) { // saved
+                item.saveCounter = item.saveCounter?.plus(1)
+                itemView.btn_save_post.text = item.saveCounter.toString()
+                itemView.btn_save_post.setTextColor(
+                    ContextCompat.getColorStateList(
+                        itemView.context,
+                        R.color.colorWhite
+                    )
+                )
+                itemView.btn_save_post.setCompoundDrawablesWithIntrinsicBounds(
+                    itemView.context.getDrawable(R.drawable.ic_save_selected), null, null, null
+                )
+            } else { //not save
+                item.saveCounter = item.saveCounter?.minus(1)
+                itemView.btn_save_post.text = item.saveCounter.toString()
+                itemView.btn_save_post.setTextColor(
+                    ContextCompat.getColorStateList(
+                        itemView.context,
+                        R.color.colorPurple
+                    )
+                )
+                itemView.btn_save_post.setCompoundDrawablesWithIntrinsicBounds(
+                    itemView.context.getDrawable(R.drawable.ic_save), null, null, null
+                )
+            }
+            events.invoke(position, TypeFeedEvent.SAVE)
+        }
+
+        // Image listener
+        itemView.ll_image_feed.setOnClickListener {
+            events.invoke(position, TypeFeedEvent.ITEM_CLICK)
+        }
+
+        itemView.btn_play_video.setOnClickListener { events.invoke(position, TypeFeedEvent.ITEM_CLICK) }
+
+    }
+}

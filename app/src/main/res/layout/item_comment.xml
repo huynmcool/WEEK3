@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorWhite">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/iv_avatar_cmt"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/margin15"
+        android:layout_marginEnd="@dimen/margin15"
+        android:background="@drawable/border_avt"
+        android:padding="2dp"
+        android:src="@drawable/ic_acc_img"
+        app:civ_border_color="@android:color/white"
+        app:civ_border_width="2dp" />
+
+    <TextView
+        android:id="@+id/txt_username_cmt"
+        style="@style/txtTile1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/iv_avatar_cmt"
+        android:layout_marginEnd="@dimen/margin15"
+        android:layout_toEndOf="@id/iv_avatar_cmt"
+        android:drawableEnd="@drawable/ic_star_circle"
+        android:drawablePadding="@dimen/margin15"
+        android:ellipsize="end"
+        android:end="@id/iv_avatar_feed_post"
+        android:maxWidth="170dp"
+        android:maxLines="3"
+        tools:text="@string/username" />
+
+
+    <TextView
+        android:id="@+id/tv_comment_content"
+        style="@style/txtNormal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/iv_avatar_cmt"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="@dimen/margin15"
+        android:paddingLeft="60dp"
+        tools:text="Comment" />
+
+    <ImageView
+        android:id="@+id/btn_show_more_cmt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/txt_username_cmt"
+        android:layout_alignTop="@id/txt_username_cmt"
+
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="@dimen/margin15"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="@string/icon_show_more_feed"
+        android:src="@drawable/ic_more" />
+
+</RelativeLayout>

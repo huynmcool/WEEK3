@@ -1,0 +1,56 @@
+package com.john117.string_travel.ui.feed.adapter
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions
+import com.john117.string_travel.R
+import com.john117.string_travel.model.Itinerary
+import com.john117.string_travel.utils.BaseViewHolder
+import kotlinx.android.synthetic.main.item_itinerary.view.*
+
+
+class ItineraryAdapter(
+    private val listItinerary: ArrayList<Itinerary>?
+) :
+    RecyclerView.Adapter<BaseViewHolder<*>>() {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): BaseViewHolder<*> {
+        val view = LayoutInflater
+            .from(viewGroup.context)
+            .inflate(R.layout.item_itinerary, viewGroup, false)
+        return ItemItineraryViewHolder(view)
+    }
+
+    override fun getItemCount(): Int {
+        return listItinerary?.size ?: 0
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
+        val element = listItinerary?.get(position)
+        when (holder) {
+            is ItemItineraryViewHolder -> holder.bind(element as Itinerary, position)
+            else -> throw IllegalArgumentException()
+        }
+    }
+
+
+    inner class ItemItineraryViewHolder(
+        itemView: View
+    ) : BaseViewHolder<Itinerary>(itemView) {
+
+        override fun bind(item: Itinerary, position: Int) {
+
+            Glide.with(itemView)
+                .load(item.photos?.url?.medium)
+                .error(R.drawable.gradient_bg_itinerary)
+                .apply(RequestOptions().transform(CenterCrop(), RoundedCorners(20)))
+                .into(itemView.img_itinerary)
+
+            itemView.tv_location_itinerary.text = item.title
+        }
+    }
+}
